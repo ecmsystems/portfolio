@@ -34,6 +34,10 @@
       --font-code: 'IBM Plex Mono', monospace;
       --radius-sm: 6px;
       --radius-md: 8px;
+
+      /* Координаты свечения по умолчанию (за экраном до первого движения мыши) */
+      --glow-x: -1000px;
+      --glow-y: -1000px;
     }
 
     * {
@@ -78,6 +82,41 @@
       max-width: 1080px;
       margin: 0 auto;
       padding: 0 32px;
+    }
+
+    /* Все семантические секции лежат выше фонового свечения */
+    header, main, footer {
+      position: relative;
+      z-index: 1;
+    }
+
+    /* Приглушенный рассеянный свет за курсором (Ambient Cursor Glow) на монотонном фоне */
+    .ambient-cursor-glow {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      z-index: 0;
+      opacity: 0;
+      transition: opacity 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+      background: radial-gradient(
+        580px circle at var(--glow-x) var(--glow-y),
+        rgba(255, 255, 255, 0.055) 0%,
+        rgba(255, 255, 255, 0.018) 40%,
+        transparent 100%
+      );
+      will-change: background;
+    }
+
+    @media (pointer: fine) and (prefers-reduced-motion: no-preference) {
+      .ambient-cursor-glow.is-active {
+        opacity: 1;
+      }
+    }
+
+    @media (pointer: coarse), (prefers-reduced-motion: reduce) {
+      .ambient-cursor-glow {
+        display: none !important;
+      }
     }
 
     /* ==========================================================================
@@ -674,6 +713,9 @@
 </head>
 <body>
 
+  <!-- ПРИГЛУШЕННЫЙ СВЕТ ЗА КУРСОРОМ (МОНОТОННЫЙ ФОН БЕЗ СЕТКИ) -->
+  <div class="ambient-cursor-glow" aria-hidden="true"></div>
+
   <!-- ==========================================================================
        1. ШАПКА
        ========================================================================== -->
@@ -903,9 +945,52 @@
         });
       });
 
-      // 3. Деликатная подсветка граней карточек кейсов при наведении
+      // 3. ПРИГЛУШЕННЫЙ СВЕТ ЗА КУРСОРОМ И ПОДСВЕТКА ГРАНЕЙ КАРТОЧЕК
       const hasFinePointer = window.matchMedia('(pointer: fine)').matches;
-      if (hasFinePointer) {
+      const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+      if (hasFinePointer && !prefersReducedMotion) {
+        const glowEl = document.querySelector('.ambient-cursor-glow');
+        const root = document.documentElement;
+
+        let targetX = -1000;
+        let targetY = -1000;
+        let currentX = -1000;
+        let currentY = -1000;
+        let isCursorActive = false;
+        let rafId = null;
+
+        function updateGlowPosition() {
+          currentX += (targetX - currentX) * 0.09;
+          currentY += (targetY - currentY) * 0.09;
+
+          root.style.setProperty('--glow-x', `${currentX.toFixed(1)}px`);
+          root.style.setProperty('--glow-y', `${currentY.toFixed(1)}px`);
+
+          rafId = requestAnimationFrame(updateGlowPosition);
+        }
+
+        window.addEventListener('mousemove', (e) => {
+          targetX = e.clientX;
+          targetY = e.clientY;
+
+          if (!isCursorActive) {
+            isCursorActive = true;
+            if (currentX < -500) {
+              currentX = targetX;
+              currentY = targetY;
+            }
+            if (glowEl) glowEl.classList.add('is-active');
+            if (!rafId) rafId = requestAnimationFrame(updateGlowPosition);
+          }
+        }, { passive: true });
+
+        document.addEventListener('mouseleave', () => {
+          isCursorActive = false;
+          if (glowEl) glowEl.classList.remove('is-active');
+        });
+
+        // Подсветка граней карточек кейсов при наведении
         const caseCards = document.querySelectorAll('.case-card');
         caseCards.forEach(card => {
           card.addEventListener('mousemove', (e) => {
