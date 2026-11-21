@@ -1,0 +1,581 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ECM Systems — Технический подряд для агентств</title>
+  <link rel="icon" type="image/svg+xml" href="favicon.svg" />
+  <link rel="alternate icon" href="favicon.ico" />
+  <link rel="apple-touch-icon" href="apple-touch-icon.png" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --bg: #0a0a0a;
+      --surface: #111111;
+      --border: #222222;
+      --border-strong: #333333;
+      --text: #f2f2f2;
+      --muted: #8a8a8a;
+      --accent: #ffffff;
+      --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      --font-mono: 'JetBrains Mono', monospace;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      background-color: var(--bg);
+      color: var(--text);
+      font-family: var(--font-sans);
+      font-size: 15px;
+      line-height: 1.55;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    a {
+      color: inherit;
+      text-decoration: none;
+    }
+
+    .container {
+      max-width: 1040px;
+      margin: 0 auto;
+      padding: 0 24px;
+    }
+
+    /* Top Bar */
+    header {
+      border-bottom: 1px solid var(--border);
+      padding: 20px 0;
+    }
+
+    .header-inner {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 16px;
+    }
+
+    .brand {
+      font-family: var(--font-mono);
+      font-size: 13px;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      font-weight: 500;
+    }
+
+    .status {
+      font-family: var(--font-mono);
+      font-size: 12px;
+      color: var(--muted);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .status-dot {
+      width: 6px;
+      height: 6px;
+      background: #e5e5e5;
+      border-radius: 50%;
+      display: inline-block;
+    }
+
+    /* Hero */
+    .hero {
+      padding: 72px 0 64px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .eyebrow {
+      font-family: var(--font-mono);
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--muted);
+      margin-bottom: 20px;
+    }
+
+    h1 {
+      font-size: clamp(28px, 4.4vw, 46px);
+      font-weight: 500;
+      line-height: 1.12;
+      letter-spacing: -0.03em;
+      max-width: 820px;
+      margin-bottom: 24px;
+    }
+
+    .hero-sub {
+      font-size: 17px;
+      color: var(--muted);
+      max-width: 660px;
+      margin-bottom: 36px;
+    }
+
+    .hero-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      align-items: center;
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 13px 22px;
+      font-size: 14px;
+      font-weight: 500;
+      border: 1px solid var(--border-strong);
+      transition: background 0.15s ease, color 0.15s ease, border-color 0.15s ease;
+      cursor: pointer;
+    }
+
+    .btn-primary {
+      background: var(--accent);
+      color: #0a0a0a;
+      border-color: var(--accent);
+    }
+
+    .btn-primary:hover {
+      background: #dcdcdc;
+      border-color: #dcdcdc;
+    }
+
+    .btn-secondary {
+      background: transparent;
+      color: var(--text);
+    }
+
+    .btn-secondary:hover {
+      border-color: var(--accent);
+    }
+
+    /* Sections */
+    section {
+      padding: 64px 0;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .section-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      margin-bottom: 36px;
+      gap: 16px;
+    }
+
+    h2 {
+      font-size: 22px;
+      font-weight: 500;
+      letter-spacing: -0.02em;
+    }
+
+    .section-num {
+      font-family: var(--font-mono);
+      font-size: 12px;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+    }
+
+    /* Cases */
+    .cases-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 32px;
+    }
+
+    .case-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+    }
+
+    .case-media {
+      border-right: 1px solid var(--border);
+      background: #050505;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      padding: 20px;
+    }
+
+    .media-wrap {
+      width: 100%;
+      aspect-ratio: 16 / 10;
+      background: #0d0d0d;
+      border: 1px solid var(--border);
+      overflow: hidden;
+      position: relative;
+    }
+
+    .media-wrap video {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+
+    .case-body {
+      padding: 28px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      gap: 24px;
+    }
+
+    .case-tag {
+      font-family: var(--font-mono);
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--muted);
+      margin-bottom: 10px;
+    }
+
+    .case-title {
+      font-size: 20px;
+      font-weight: 500;
+      letter-spacing: -0.02em;
+      margin-bottom: 12px;
+    }
+
+    .case-desc {
+      color: var(--muted);
+      font-size: 14px;
+      margin-bottom: 18px;
+    }
+
+    .case-points {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      margin-bottom: 20px;
+    }
+
+    .case-points li {
+      font-size: 14px;
+      padding-left: 16px;
+      position: relative;
+      color: #d4d4d4;
+    }
+
+    .case-points li::before {
+      content: "—";
+      position: absolute;
+      left: 0;
+      color: var(--muted);
+    }
+
+    .stack {
+      font-family: var(--font-mono);
+      font-size: 11px;
+      color: var(--muted);
+      padding-top: 16px;
+      border-top: 1px solid var(--border);
+      line-height: 1.7;
+    }
+
+    .case-links {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 16px;
+    }
+
+    .case-links .btn {
+      padding: 10px 16px;
+      font-size: 13px;
+    }
+
+    /* Capabilities Grid */
+    .grid-2 {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      border-top: 1px solid var(--border);
+      border-left: 1px solid var(--border);
+    }
+
+    .cell {
+      padding: 28px;
+      border-right: 1px solid var(--border);
+      border-bottom: 1px solid var(--border);
+      background: var(--bg);
+    }
+
+    .cell-num {
+      font-family: var(--font-mono);
+      font-size: 12px;
+      color: var(--muted);
+      margin-bottom: 12px;
+    }
+
+    .cell h3 {
+      font-size: 16px;
+      font-weight: 500;
+      margin-bottom: 10px;
+    }
+
+    .cell p {
+      font-size: 14px;
+      color: var(--muted);
+    }
+
+    /* Terms */
+    .terms-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 24px;
+    }
+
+    .term-box {
+      border: 1px solid var(--border);
+      padding: 24px;
+      background: var(--surface);
+    }
+
+    .term-box h3 {
+      font-family: var(--font-mono);
+      font-size: 13px;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      margin-bottom: 10px;
+      color: var(--text);
+    }
+
+    .term-box p {
+      font-size: 14px;
+      color: var(--muted);
+    }
+
+    /* Footer CTA */
+    .footer-cta {
+      padding: 72px 0;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 24px;
+      flex-wrap: wrap;
+    }
+
+    .footer-cta h2 {
+      font-size: 26px;
+      margin-bottom: 8px;
+    }
+
+    .footer-cta p {
+      color: var(--muted);
+      max-width: 520px;
+    }
+
+    @media (max-width: 820px) {
+      .case-card {
+        grid-template-columns: 1fr;
+      }
+      .case-media {
+        border-right: none;
+        border-bottom: 1px solid var(--border);
+      }
+      .grid-2,
+      .terms-grid {
+        grid-template-columns: 1fr;
+      }
+      .hero {
+        padding: 48px 0;
+      }
+      section {
+        padding: 48px 0;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <div class="container header-inner">
+      <div class="brand">ECM Systems / Dev Partner</div>
+      <div class="status">
+        <span class="status-dot"></span>
+        White-Label субподряд · РФ и зарубеж
+      </div>
+    </div>
+  </header>
+
+  <main>
+    <!-- HERO -->
+    <div class="container">
+      <div class="hero">
+        <div class="eyebrow">Технический партнер для веб-студий, CRM-интеграторов и агентств</div>
+        <h1>Кастомные ИИ-виджеты, Telegram-боты и нестандартный фронтенд на коде</h1>
+        <p class="hero-sub">
+          Забираю на субподряд задачи, где конструкторы (Tilda, Salebot, n8n) упираются в потолок или не хватает своих разработчиков. Работаю под вашим брендом, сдаю чистый код без срывов сроков.
+        </p>
+        <div class="hero-actions">
+          <a class="btn btn-primary" href="https://t.me/YOUR_TG_USERNAME" target="_blank" rel="noopener">Написать в Telegram</a>
+          <a class="btn btn-secondary" href="#cases">Смотреть живые демо ↓</a>
+        </div>
+      </div>
+    </div>
+
+    <!-- CASES -->
+    <section id="cases">
+      <div class="container">
+        <div class="section-head">
+          <h2>Рабочие демо-стенды</h2>
+          <span class="section-num">01 / Практика</span>
+        </div>
+
+        <div class="cases-grid">
+
+          <!-- CASE 1 -->
+          <article class="case-card">
+            <div class="case-media">
+              <div class="media-wrap">
+                <!-- Положи файл demo-2.mp4 рядом с index.html -->
+                <video src="demo-2.mp4" controls muted playsinline preload="metadata"></video>
+              </div>
+            </div>
+            <div class="case-body">
+              <div>
+                <div class="case-tag">Сервисный бизнес · Виджет + Telegram</div>
+                <h3 class="case-title">ИИ-продавец с расчетом цены и записью 24/7</h3>
+                <p class="case-desc">
+                  Единая система обработки заявок для локальных услуг и онлайн-школ (флагманская сборка под детейлинг-студии).
+                </p>
+                <ul class="case-points">
+                  <li><strong>Встраивается одной строкой (widget.js):</strong> полная изоляция через Shadow DOM — не конфликтует со стилями Tilda, WordPress или кастомного сайта.</li>
+                  <li><strong>Смена тем и нативный UI:</strong> три встроенные темы под дизайн клиента + быстрая генерация персональных демо через URL-параметр (?studio=...).</li>
+                  <li><strong>Умный расчет и допродажи:</strong> в реальном времени собирает заказ-наряд, считает цену по прайсу, понимает сленг/падежи и мягко допродает допуслуги.</li>
+                  <li><strong>Гибрид без VPN в РФ:</strong> единая логика сайта и Telegram-бота, хранение в SQLite (WAL) и автовыгрузка лидов в Google Sheets / CRM.</li>
+                </ul>
+              </div>
+              <div>
+                <div class="stack">Python · FastAPI · aiogram 3.x · SQLite · Gemini API · Vanilla JS (Shadow DOM) · Google Sheets API</div>
+                <div class="case-links">
+                  <a class="btn btn-primary" href="https://ecmsystems.github.io/Demo-bot" target="_blank" rel="noopener">Открыть веб-виджет ↗</a>
+                  <a class="btn btn-secondary" href="https://t.me/ecm_systems_demo_bot" target="_blank" rel="noopener">Тест в Telegram ↗</a>
+                </div>
+              </div>
+            </div>
+          </article>
+
+          <!-- CASE 2 -->
+          <article class="case-card">
+            <div class="case-media">
+              <div class="media-wrap">
+                <!-- Положи файл demo-1.mp4 рядом с index.html -->
+                <video src="demo-1.mp4" controls muted playsinline preload="metadata"></video>
+              </div>
+            </div>
+            <div class="case-body">
+              <div>
+                <div class="case-tag">E-commerce & 3D · Shopify / Кастом</div>
+                <h3 class="case-title">Интерактивный 3D-сайт + AI Sizing Concierge</h3>
+                <p class="case-desc">
+                  Встраиваемый ИИ-консьерж для интернет-магазинов одежды, обуви и брендов со сложным подбором параметров.
+                </p>
+                <ul class="case-points">
+                  <li><strong>Снимает барьер перед оплатой:</strong> подбирает точный размер по росту, весу и посадке за 5 секунд прямо над кнопкой «Add to Cart».</li>
+                  <li><strong>Интерактивный фронтенд:</strong> кастомная верстка с 3D-визуализацией товара под проекты с высоким средним чеком.</li>
+                  <li><strong>100% под брендбук:</strong> вручную стилизуется под шрифты, цвета и сетку магазина — выглядит как родная часть сайта, без тяжелых плагинов.</li>
+                  <li><strong>Автоматический сбор данных:</strong> все обращения, параметры и лиды улетают в Google Sheets или CRM клиента.</li>
+                </ul>
+              </div>
+              <div>
+                <div class="stack">Python · FastAPI · Gemini API · HTML5/CSS3 · Vanilla JS · 3D Frontend · Google Sheets API</div>
+                <div class="case-links">
+                  <a class="btn btn-primary" href="https://ecmsystems.github.io/NordicMoution-bot-demo/" target="_blank" rel="noopener">Открыть 3D-демо ↗</a>
+                </div>
+              </div>
+            </div>
+          </article>
+
+        </div>
+      </div>
+    </section>
+
+    <!-- CAPABILITIES -->
+    <section>
+      <div class="container">
+        <div class="section-head">
+          <h2>Что забираю на субподряд</h2>
+          <span class="section-num">02 / Модули</span>
+        </div>
+
+        <div class="grid-2">
+          <div class="cell">
+            <div class="cell-num">01</div>
+            <h3>Встраиваемые ИИ-виджеты на сайты</h3>
+            <p>Консультанты, калькуляторы стоимости и подборщики товаров под Tilda, Shopify, WordPress и кастомные сайты. Изоляция через Shadow DOM, нативный дизайн.</p>
+          </div>
+          <div class="cell">
+            <div class="cell-num">02</div>
+            <h3>Telegram-боты и бэкенд на Python</h3>
+            <p>Кастомная логика на aiogram 3.x и FastAPI: LLM-воронки, базы данных (SQLite/SQL), запись клиентов, интеграция с CRM, Google Таблицами и внешними API.</p>
+          </div>
+          <div class="cell">
+            <div class="cell-num">03</div>
+            <h3>Нестандартный фронтенд и 3D-блоки</h3>
+            <p>Интерактивные продуктовые экраны, 3D-презентации и кастомные JS-модули, которые невозможно собрать стандартными блоками конструктора.</p>
+          </div>
+          <div class="cell">
+            <div class="cell-num">04</div>
+            <h3>Автоматизация файлов и парсинг</h3>
+            <p>Скрипты для обработки PDF/Excel-прайсов, генерация смет и КП, парсинг данных и связка разрозненных сервисов клиента в единый конвейер.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- TERMS -->
+    <section>
+      <div class="container">
+        <div class="section-head">
+          <h2>Условия работы со студиями</h2>
+          <span class="section-num">03 / Формат</span>
+        </div>
+
+        <div class="terms-grid">
+          <div class="term-box">
+            <h3>White-Label</h3>
+            <p>Работаю под брендом вашего агентства. Напрямую к вашим клиентам не лезу и контакты не увожу — при необходимости участвую в созвонах как ваш техлид.</p>
+          </div>
+          <div class="term-box">
+            <h3>Предсказуемость</h3>
+            <p>Фиксирую объем и реальный срок до старта. Не пропадаю из чатов, регулярно скидываю промежуточный результат на тестовый стенд.</p>
+          </div>
+          <div class="term-box">
+            <h3>Оплата и документы</h3>
+            <p>Фикс за задачу (50% старт / 50% сдача) или по этапам. Закрываю официальным чеком (самозанятый / НПД) либо переводом.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- FOOTER CTA -->
+    <div class="container">
+      <div class="footer-cta">
+        <div>
+          <h2>Есть нестандартная задача или перегруз?</h2>
+          <p>Скиньте вводные в Telegram — за пару часов оценю сроки, архитектуру и точную стоимость под ваш бюджет.</p>
+        </div>
+        <a class="btn btn-primary" href="https://t.me/YOUR_TG_USERNAME" target="_blank" rel="noopener">Обсудить задачу в Telegram ↗</a>
+      </div>
+    </div>
+  </main>
+
+</body>
+</html>
