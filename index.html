@@ -34,6 +34,10 @@
       --font-code: 'IBM Plex Mono', monospace;
       --radius-sm: 6px;
       --radius-md: 8px;
+
+      /* Координаты свечения по умолчанию (за экраном до первого движения мыши) */
+      --glow-x: -1000px;
+      --glow-y: -1000px;
     }
 
     * {
@@ -58,6 +62,7 @@
       -webkit-font-smoothing: antialiased;
       -moz-osx-font-smoothing: grayscale;
       overflow-x: hidden;
+      position: relative;
     }
 
     a {
@@ -79,8 +84,78 @@
       padding: 0 32px;
     }
 
+    /* Все семантические секции лежат выше фоновых слоев */
+    header, main, footer {
+      position: relative;
+      z-index: 1;
+    }
+
     /* ==========================================================================
-       2. ШАПКА (ЛЕГКАЯ, ЧИСТАЯ, БЕЗ ЛИШНИХ КОРОБОК)
+       2. ТАКТИЛЬНЫЕ ФОНОВЫЕ СЛОИ (AMBIENT GLOW, MASKED GRID, GRAIN)
+       ========================================================================== */
+
+    /* 4. Микро-текстура матового анодированного металла (Anti-Banding Grain) */
+    .anti-banding-grain {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      z-index: 0;
+      opacity: 0.025;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+      background-repeat: repeat;
+      will-change: transform;
+    }
+
+    /* 1. Плавный приглушенный свет за курсором (Ambient Cursor Glow) */
+    .ambient-cursor-glow {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      z-index: 0;
+      opacity: 0;
+      transition: opacity 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+      background: radial-gradient(
+        580px circle at var(--glow-x) var(--glow-y),
+        rgba(255, 255, 255, 0.055) 0%,
+        rgba(255, 255, 255, 0.02) 40%,
+        transparent 100%
+      );
+      will-change: background;
+    }
+
+    /* 2. Скрытая инженерная сетка 48px, проявляемая светом (Masked Micro-Grid) */
+    .masked-micro-grid {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      z-index: 0;
+      opacity: 0;
+      transition: opacity 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+      background-size: 48px 48px;
+      background-image:
+        linear-gradient(to right, rgba(255, 255, 255, 0.045) 1px, transparent 1px),
+        linear-gradient(to bottom, rgba(255, 255, 255, 0.045) 1px, transparent 1px);
+      -webkit-mask-image: radial-gradient(320px circle at var(--glow-x) var(--glow-y), black 0%, transparent 100%);
+      mask-image: radial-gradient(320px circle at var(--glow-x) var(--glow-y), black 0%, transparent 100%);
+      will-change: mask-image, -webkit-mask-image;
+    }
+
+    @media (pointer: fine) and (prefers-reduced-motion: no-preference) {
+      .ambient-cursor-glow.is-active,
+      .masked-micro-grid.is-active {
+        opacity: 1;
+      }
+    }
+
+    @media (pointer: coarse), (prefers-reduced-motion: reduce) {
+      .ambient-cursor-glow,
+      .masked-micro-grid {
+        display: none !important;
+      }
+    }
+
+    /* ==========================================================================
+       3. ШАПКА (ЛЕГКАЯ, ЧИСТАЯ, БЕЗ ЛИШНИХ КОРОБОК)
        ========================================================================== */
     header {
       height: 72px;
@@ -131,7 +206,7 @@
     }
 
     /* ==========================================================================
-       3. СЕКЦИЯ HERO (КОМПАКТНАЯ, ВЫВЕРЕННАЯ ТИПОГРАФИКА)
+       4. СЕКЦИЯ HERO (КОМПАКТНАЯ, ВЫВЕРЕННАЯ ТИПОГРАФИКА)
        ========================================================================== */
     .hero {
       padding-top: 88px;
@@ -204,7 +279,7 @@
     }
 
     /* ==========================================================================
-       4. СЕКЦИЯ КЕЙСОВ (#cases)
+       5. СЕКЦИЯ КЕЙСОВ (#cases) И ПОДСВЕТКА ГРАНЕЙ (CARD EDGE HIGHLIGHT)
        ========================================================================== */
     .section-divider {
       border-top: 1px solid var(--border);
@@ -226,6 +301,7 @@
       margin-bottom: 112px;
     }
 
+    /* 3. Деликатная подсветка граней и поверхности на карточках кейсов */
     .case-card {
       display: grid;
       grid-template-columns: 55% 45%;
@@ -233,11 +309,63 @@
       border-radius: var(--radius-md);
       background-color: var(--surface);
       overflow: hidden;
+      position: relative;
       transition: border-color 0.2s ease;
     }
 
     .case-card:hover {
       border-color: var(--border-hover);
+    }
+
+    /* Тонкий блик по контуру рамки карточки (1px) в точке курсора */
+    .case-card::before {
+      content: "";
+      position: absolute;
+      inset: -1px;
+      border-radius: calc(var(--radius-md) + 1px);
+      padding: 1px;
+      background: radial-gradient(
+        380px circle at var(--card-x, -1000px) var(--card-y, -1000px),
+        rgba(255, 255, 255, 0.16) 0%,
+        rgba(255, 255, 255, 0.04) 50%,
+        transparent 100%
+      );
+      -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+      -webkit-mask-composite: xor;
+      mask-composite: exclude;
+      pointer-events: none;
+      opacity: 0;
+      transition: opacity 0.4s ease;
+      z-index: 2;
+    }
+
+    /* Деликатная подсветка поверхности карточки при приближении курсора */
+    .case-card::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      border-radius: var(--radius-md);
+      background: radial-gradient(
+        440px circle at var(--card-x, -1000px) var(--card-y, -1000px),
+        rgba(255, 255, 255, 0.04) 0%,
+        transparent 100%
+      );
+      pointer-events: none;
+      opacity: 0;
+      transition: opacity 0.4s ease;
+      z-index: 1;
+    }
+
+    .case-card.is-hovered::before,
+    .case-card.is-hovered::after {
+      opacity: 1;
+    }
+
+    /* Содержимое карточек всегда выше слоя подсветки */
+    .case-media-side,
+    .case-content-side {
+      position: relative;
+      z-index: 3;
     }
 
     /* Левая колонка превью */
@@ -447,7 +575,7 @@
     }
 
     /* ==========================================================================
-       5. СЕКЦИЯ «НАПРАВЛЕНИЯ И ФОРМАТ РАБОТЫ» (#info)
+       6. СЕКЦИЯ «НАПРАВЛЕНИЯ И ФОРМАТ РАБОТЫ» (#info)
        ========================================================================== */
     .info-section {
       margin-bottom: 112px;
@@ -492,7 +620,7 @@
     }
 
     /* ==========================================================================
-       6. ФУТЕР (СПОКОЙНЫЙ, РЕДАКЦИОННЫЙ)
+       7. ФУТЕР (СПОКОЙНЫЙ, РЕДАКЦИОННЫЙ)
        ========================================================================== */
     footer {
       border-top: 1px solid var(--border);
@@ -548,7 +676,7 @@
     }
 
     /* ==========================================================================
-       7. МОБИЛЬНАЯ АДАПТАЦИЯ (360px - 820px)
+       8. МОБИЛЬНАЯ АДАПТАЦИЯ (360px - 820px)
        ========================================================================== */
     @media (max-width: 860px) {
       .case-card {
@@ -619,6 +747,11 @@
   </style>
 </head>
 <body>
+
+  <!-- ФОНОВЫЕ СЛОИ (ЗЕРНИСТОСТЬ МАТОВОГО МЕТАЛЛА, СВЕТ ЗА КУРСОРОМ И СКРЫТАЯ СЕТКА) -->
+  <div class="anti-banding-grain" aria-hidden="true"></div>
+  <div class="ambient-cursor-glow" aria-hidden="true"></div>
+  <div class="masked-micro-grid" aria-hidden="true"></div>
 
   <!-- ==========================================================================
        1. ШАПКА
@@ -815,13 +948,13 @@
   </footer>
 
   <!-- ==========================================================================
-       6. МИНИМУМ VANILLA JS (КОПИРОВАНИЕ + ВИДЕО ФОЛБЭК)
+       6. VANILLA JS (СНИППЕТ, ФОЛБЭК ВИДЕО И ПЛАВНЫЕ ТАКТИЛЬНЫЕ СЛОИ)
        ========================================================================== -->
   <script>
     (function () {
       'use strict';
 
-      // Копирование сниппета кода
+      // 1. Копирование сниппета кода
       const copyBtn = document.querySelector('.btn-copy-code');
       if (copyBtn) {
         copyBtn.addEventListener('click', async () => {
@@ -840,7 +973,7 @@
         });
       }
 
-      // Обработка отсутствия или ошибки видеофайлов
+      // 2. Обработка отсутствия или ошибки видеофайлов
       document.querySelectorAll('.case-video').forEach(video => {
         video.addEventListener('error', () => {
           video.style.display = 'none';
@@ -848,6 +981,74 @@
           if (fallback) fallback.style.display = 'flex';
         });
       });
+
+      // 3. ТАКТИЛЬНЫЙ СВЕТ И СЕТКА ТОЛЬКО ДЛЯ УСТРОЙСТВ С МЫШЬЮ
+      const hasFinePointer = window.matchMedia('(pointer: fine)').matches;
+      const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+      if (hasFinePointer && !prefersReducedMotion) {
+        const glowEl = document.querySelector('.ambient-cursor-glow');
+        const gridEl = document.querySelector('.masked-micro-grid');
+        const root = document.documentElement;
+
+        let targetX = -1000;
+        let targetY = -1000;
+        let currentX = -1000;
+        let currentY = -1000;
+        let isCursorActive = false;
+        let rafId = null;
+
+        function updateGlowPosition() {
+          // Линейная интерполяция (lerp) с инерцией 0.09 для шелковистого скольжения
+          currentX += (targetX - currentX) * 0.09;
+          currentY += (targetY - currentY) * 0.09;
+
+          root.style.setProperty('--glow-x', `${currentX.toFixed(1)}px`);
+          root.style.setProperty('--glow-y', `${currentY.toFixed(1)}px`);
+
+          // Продолжаем цикл анимации
+          rafId = requestAnimationFrame(updateGlowPosition);
+        }
+
+        window.addEventListener('mousemove', (e) => {
+          targetX = e.clientX;
+          targetY = e.clientY;
+
+          if (!isCursorActive) {
+            isCursorActive = true;
+            if (currentX < -500) {
+              currentX = targetX;
+              currentY = targetY;
+            }
+            if (glowEl) glowEl.classList.add('is-active');
+            if (gridEl) gridEl.classList.add('is-active');
+            if (!rafId) rafId = requestAnimationFrame(updateGlowPosition);
+          }
+        }, { passive: true });
+
+        document.addEventListener('mouseleave', () => {
+          isCursorActive = false;
+          if (glowEl) glowEl.classList.remove('is-active');
+          if (gridEl) gridEl.classList.remove('is-active');
+        });
+
+        // 4. ДЕЛИКАТНАЯ ПОДСВЕТКА ГРАНЕЙ И ПОВЕРХНОСТИ НА КАРТОЧКАХ КЕЙСОВ
+        const caseCards = document.querySelectorAll('.case-card');
+        caseCards.forEach(card => {
+          card.addEventListener('mousemove', (e) => {
+            const rect = card.getBoundingClientRect();
+            const x = e.clientX - rect.left;
+            const y = e.clientY - rect.top;
+            card.style.setProperty('--card-x', `${x}px`);
+            card.style.setProperty('--card-y', `${y}px`);
+            card.classList.add('is-hovered');
+          }, { passive: true });
+
+          card.addEventListener('mouseleave', () => {
+            card.classList.remove('is-hovered');
+          });
+        });
+      }
     })();
   </script>
 </body>
