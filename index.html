@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>ECM Systems — Технический субподряд для веб-студий и CRM-интеграторов</title>
-  <meta name="description" content="Разработка на коде под вашим брендом: встраиваемые ИИ-виджеты (Shadow DOM), Telegram-боты, интеграции и нестандартный фронтенд." />
+  <meta name="description" content="Разработка на коде под вашим брендом: встраиваемые ИИ-виджеты (Shadow DOM), Telegram-боты, интеграции и кастомный фронтенд." />
 
   <!-- Чистый инлайн SVG фавикон: темный квадрат 4px с лаконичной геометрией ECM -->
   <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='4' fill='%230B0B0C'/%3E%3Crect x='8' y='8' width='16' height='2' fill='%23F3F3F4'/%3E%3Crect x='8' y='15' width='11' height='2' fill='%23F3F3F4'/%3E%3Crect x='8' y='22' width='16' height='2' fill='%23F3F3F4'/%3E%3C/svg%3E" />
@@ -90,7 +90,11 @@
       z-index: 1;
     }
 
-    /* Приглушенный рассеянный свет за курсором (Ambient Cursor Glow) на монотонном фоне */
+    /* ==========================================================================
+       2. ТАКТИЛЬНЫЕ ФОНОВЫЕ СЛОИ (СВЕТ ЗА КУРСОРОМ И СКРЫТАЯ СЕТКА)
+       ========================================================================== */
+
+    /* Приглушенный рассеянный свет за курсором (Ambient Cursor Glow) */
     .ambient-cursor-glow {
       position: fixed;
       inset: 0;
@@ -107,20 +111,39 @@
       will-change: background;
     }
 
+    /* Архитектурная микро-сетка 48px, проявляемая строго в ореоле света курсора */
+    .masked-micro-grid {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      z-index: 0;
+      opacity: 0;
+      transition: opacity 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+      background-size: 48px 48px;
+      background-image:
+        linear-gradient(to right, rgba(255, 255, 255, 0.035) 1px, transparent 1px),
+        linear-gradient(to bottom, rgba(255, 255, 255, 0.035) 1px, transparent 1px);
+      -webkit-mask-image: radial-gradient(320px circle at var(--glow-x) var(--glow-y), black 0%, transparent 100%);
+      mask-image: radial-gradient(320px circle at var(--glow-x) var(--glow-y), black 0%, transparent 100%);
+      will-change: mask-image, -webkit-mask-image;
+    }
+
     @media (pointer: fine) and (prefers-reduced-motion: no-preference) {
-      .ambient-cursor-glow.is-active {
+      .ambient-cursor-glow.is-active,
+      .masked-micro-grid.is-active {
         opacity: 1;
       }
     }
 
     @media (pointer: coarse), (prefers-reduced-motion: reduce) {
-      .ambient-cursor-glow {
+      .ambient-cursor-glow,
+      .masked-micro-grid {
         display: none !important;
       }
     }
 
     /* ==========================================================================
-       2. ШАПКА (ЛЕГКАЯ, ЧИСТАЯ, БЕЗ ЛИШНИХ КОРОБОК)
+       3. ШАПКА (ЛЕГКАЯ, ЧИСТАЯ, БЕЗ ЛИШНИХ КОРОБОК)
        ========================================================================== */
     header {
       height: 72px;
@@ -266,7 +289,7 @@
       margin-bottom: 112px;
     }
 
-    /* 3. Деликатная подсветка граней и поверхности на карточках кейсов */
+    /* Деликатная подсветка граней и поверхности на карточках кейсов */
     .case-card {
       display: grid;
       grid-template-columns: 55% 45%;
@@ -339,10 +362,48 @@
       padding: 24px;
       border-right: 1px solid var(--border);
       display: flex;
-      align-items: center;
+      flex-direction: column;
+      align-items: stretch;
       justify-content: center;
     }
 
+    /* Сегментированный переключатель каналов */
+    .channel-switch-wrap {
+      display: inline-flex;
+      background-color: #121215;
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      padding: 3px;
+      gap: 3px;
+      margin-bottom: 14px;
+      align-self: flex-start;
+      max-width: 100%;
+    }
+
+    .channel-tab-btn {
+      font-family: var(--font-main);
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--text-secondary);
+      padding: 5px 14px;
+      border-radius: 4px;
+      transition: color 0.15s ease, background-color 0.15s ease, border-color 0.15s ease;
+      text-align: center;
+      border: 1px solid transparent;
+      white-space: nowrap;
+    }
+
+    .channel-tab-btn:hover {
+      color: var(--text);
+    }
+
+    .channel-tab-btn.is-active {
+      color: var(--text);
+      background-color: #202024;
+      border-color: rgba(255, 255, 255, 0.12);
+    }
+
+    /* Видовой блок с соотношением 16/10 */
     .video-viewport {
       width: 100%;
       aspect-ratio: 16 / 10;
@@ -353,6 +414,19 @@
       position: relative;
     }
 
+    /* Вкладки демонстрации внутри рамки */
+    .channel-view {
+      display: none;
+      width: 100%;
+      height: 100%;
+      position: relative;
+    }
+
+    .channel-view.is-active {
+      display: block;
+    }
+
+    .channel-view video,
     .video-viewport video {
       width: 100%;
       height: 100%;
@@ -390,6 +464,234 @@
 
     .fallback-open-link:hover {
       border-color: var(--text);
+    }
+
+    /* ==========================================================================
+       МОНОХРОМНЫЙ МОКАП ТЕЛЕГРАМ-ДИАЛОГА (ЧИСТЫЙ HTML/CSS)
+       ========================================================================== */
+    .tg-mockup {
+      width: 100%;
+      height: 100%;
+      background-color: #0c0c0e;
+      display: flex;
+      flex-direction: column;
+      position: relative;
+      overflow: hidden;
+      font-family: var(--font-main);
+    }
+
+    .tg-mockup-header {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 10px 14px;
+      background-color: rgba(19, 19, 21, 0.95);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+      flex-shrink: 0;
+    }
+
+    .tg-avatar {
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      background-color: #222226;
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      color: #F3F3F4;
+      font-size: 10px;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      letter-spacing: -0.02em;
+      flex-shrink: 0;
+    }
+
+    .tg-header-info {
+      flex: 1;
+      min-width: 0;
+      line-height: 1.25;
+    }
+
+    .tg-bot-title {
+      font-size: 12.5px;
+      font-weight: 500;
+      color: var(--text);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .tg-bot-user {
+      font-family: var(--font-code);
+      font-size: 11px;
+      color: var(--text-muted);
+      transition: color 0.15s ease;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      display: block;
+    }
+
+    .tg-bot-user:hover {
+      color: var(--text);
+    }
+
+    .tg-header-link {
+      font-size: 13px;
+      color: var(--text-muted);
+      padding: 3px 6px;
+      border-radius: 4px;
+      transition: color 0.15s ease;
+      flex-shrink: 0;
+    }
+
+    .tg-header-link:hover {
+      color: var(--text);
+    }
+
+    .tg-messages-scroll {
+      flex: 1;
+      padding: 12px 14px;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 9px;
+      scrollbar-width: thin;
+      scrollbar-color: rgba(255, 255, 255, 0.1) transparent;
+    }
+
+    .tg-msg {
+      display: flex;
+      width: 100%;
+    }
+
+    .tg-msg-user {
+      justify-content: flex-end;
+    }
+
+    .tg-msg-bot {
+      justify-content: flex-start;
+    }
+
+    .tg-bubble {
+      max-width: 88%;
+      position: relative;
+      font-size: 12.5px;
+      line-height: 1.45;
+      padding: 8px 11px;
+      word-break: break-word;
+    }
+
+    .tg-bubble-user {
+      background-color: #232328;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      color: var(--text);
+      border-radius: 12px 12px 3px 12px;
+    }
+
+    .tg-bubble-bot {
+      background-color: #17171a;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      color: var(--text);
+      border-radius: 12px 12px 12px 3px;
+    }
+
+    .tg-calc-lead {
+      font-size: 12.5px;
+      margin-bottom: 3px;
+      color: var(--text);
+    }
+
+    .tg-calc-details {
+      font-size: 11.5px;
+      color: var(--text-secondary);
+      margin-bottom: 6px;
+    }
+
+    .tg-price-badge {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: baseline;
+      gap: 6px;
+      padding: 5px 8px;
+      background-color: rgba(255, 255, 255, 0.04);
+      border: 1px solid rgba(255, 255, 255, 0.07);
+      border-radius: 4px;
+      margin-bottom: 6px;
+      font-size: 12px;
+    }
+
+    .tg-price-badge strong {
+      font-size: 13px;
+      color: #FFFFFF;
+    }
+
+    .tg-calc-note {
+      font-size: 11px;
+      color: var(--text-muted);
+    }
+
+    .tg-upsell {
+      font-size: 11.5px;
+      color: #B4B4BA;
+      margin-bottom: 7px;
+    }
+
+    .tg-inline-keyboard {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 6px;
+      margin-top: 5px;
+    }
+
+    .tg-inline-btn {
+      display: block;
+      text-align: center;
+      padding: 6px 8px;
+      font-size: 11.5px;
+      font-weight: 500;
+      color: var(--text);
+      background-color: rgba(255, 255, 255, 0.06);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 4px;
+      transition: background-color 0.15s ease, border-color 0.15s ease;
+    }
+
+    .tg-inline-btn:hover {
+      background-color: rgba(255, 255, 255, 0.12);
+      border-color: rgba(255, 255, 255, 0.2);
+    }
+
+    .tg-time {
+      display: block;
+      font-size: 10px;
+      color: var(--text-muted);
+      text-align: right;
+      margin-top: 3px;
+    }
+
+    .tg-mockup-footer {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 8px 12px;
+      background-color: rgba(19, 19, 21, 0.95);
+      border-top: 1px solid rgba(255, 255, 255, 0.08);
+      font-size: 12px;
+      color: var(--text-secondary);
+      transition: color 0.15s ease, background-color 0.15s ease;
+      flex-shrink: 0;
+      text-align: center;
+    }
+
+    .tg-mockup-footer:hover {
+      color: var(--text);
+      background-color: #19191d;
+    }
+
+    .tg-mockup-footer .mono {
+      font-family: var(--font-code);
+      color: var(--text);
     }
 
     /* Правая колонка описания */
@@ -446,17 +748,72 @@
       color: var(--text-muted);
     }
 
-    /* Строка кода со сниппетом */
-    .code-embed-row {
+    /* Двухуровневый инженерный блок интеграции «Сайт + Telegram» */
+    .integration-embed-box {
+      background-color: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      overflow: hidden;
+      margin-bottom: 18px;
+    }
+
+    .integration-row {
       display: flex;
       align-items: center;
       justify-content: space-between;
       gap: 12px;
       padding: 8px 12px;
-      background-color: var(--bg);
-      border: 1px solid var(--border);
-      border-radius: var(--radius-sm);
-      margin-bottom: 18px;
+    }
+
+    .integration-row + .integration-row {
+      border-top: 1px solid rgba(255, 255, 255, 0.08);
+    }
+
+    .integration-left {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      min-width: 0;
+      overflow: hidden;
+    }
+
+    .integration-badge {
+      font-family: var(--font-code);
+      font-size: 10.5px;
+      font-weight: 500;
+      color: var(--text-muted);
+      padding: 2px 6px;
+      background-color: rgba(255, 255, 255, 0.04);
+      border: 1px solid rgba(255, 255, 255, 0.06);
+      border-radius: 3px;
+      flex-shrink: 0;
+      letter-spacing: 0.04em;
+    }
+
+    .integration-tg-handle {
+      font-family: var(--font-code);
+      font-size: 12.5px;
+      color: var(--text);
+      white-space: nowrap;
+      transition: color 0.15s ease;
+    }
+
+    .integration-tg-handle:hover {
+      color: #FFFFFF;
+      text-decoration: underline;
+    }
+
+    .integration-note {
+      font-size: 12px;
+      color: var(--text-muted);
+      white-space: nowrap;
+    }
+
+    .integration-actions {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      flex-shrink: 0;
     }
 
     .code-snippet {
@@ -489,6 +846,36 @@
     .btn-copy-code.copied {
       color: var(--text);
       border-color: var(--text-secondary);
+    }
+
+    .btn-open-link {
+      font-size: 12px;
+      font-weight: 400;
+      color: var(--text-secondary);
+      padding: 4px 8px;
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      background-color: var(--surface);
+      white-space: nowrap;
+      transition: color 0.15s ease, border-color 0.15s ease;
+    }
+
+    .btn-open-link:hover {
+      color: var(--text);
+      border-color: var(--border-hover);
+    }
+
+    /* Одиночная строка кода для второго кейса */
+    .code-embed-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 8px 12px;
+      background-color: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      margin-bottom: 18px;
     }
 
     /* Стек одной строкой */
@@ -641,7 +1028,7 @@
     }
 
     /* ==========================================================================
-       8. МОБИЛЬНАЯ АДАПТАЦИЯ (360px - 820px)
+       8. МОБИЛЬНАЯ АДАПТАЦИЯ (360px - 860px)
        ========================================================================== */
     @media (max-width: 860px) {
       .case-card {
@@ -708,13 +1095,23 @@
         width: 100%;
         justify-content: center;
       }
+
+      .integration-note {
+        display: none;
+      }
+
+      .integration-row {
+        padding: 8px 10px;
+        gap: 8px;
+      }
     }
   </style>
 </head>
 <body>
 
-  <!-- ПРИГЛУШЕННЫЙ СВЕТ ЗА КУРСОРОМ (МОНОТОННЫЙ ФОН БЕЗ СЕТКИ) -->
+  <!-- ТАКТИЛЬНЫЕ ФОНОВЫЕ СЛОИ (ПРИГЛУШЕННЫЙ СВЕТ И ПРОЯВЛЯЮЩАЯСЯ СЕТКА) -->
   <div class="ambient-cursor-glow" aria-hidden="true"></div>
+  <div class="masked-micro-grid" aria-hidden="true"></div>
 
   <!-- ==========================================================================
        1. ШАПКА
@@ -758,13 +1155,78 @@
 
           <!-- КЕЙС 1 -->
           <article class="case-card">
-            <!-- Превью видео -->
+            <!-- Превью видео и интерактивный Telegram-мокап -->
             <div class="case-media-side">
+              <!-- Сегментированный переключатель каналов -->
+              <div class="channel-switch-wrap" role="tablist" aria-label="Каналы демонстрации">
+                <button type="button" role="tab" class="channel-tab-btn is-active" data-channel="web" aria-selected="true" aria-controls="view-channel-web">
+                  Веб-виджет
+                </button>
+                <button type="button" role="tab" class="channel-tab-btn" data-channel="tg" aria-selected="false" aria-controls="view-channel-tg">
+                  Telegram-бот
+                </button>
+              </div>
+
+              <!-- Видовой блок с фиксированным соотношением 16/10 -->
               <div class="video-viewport">
-                <video class="case-video" src="demo-2.mp4" poster="site-1440.png" controls muted playsinline preload="metadata"></video>
-                <div class="video-fallback-state">
-                  <span class="fallback-url-text">ecmsystems.github.io/Demo-bot</span>
-                  <a href="https://ecmsystems.github.io/Demo-bot" target="_blank" rel="noopener noreferrer" class="fallback-open-link">Открыть живой стенд ↗</a>
+                <!-- Канал 1: Веб-виджет (по умолчанию) -->
+                <div id="view-channel-web" class="channel-view is-active" role="tabpanel">
+                  <video class="case-video" src="demo-2.mp4" poster="site-1440.png" controls muted playsinline preload="metadata"></video>
+                  <div class="video-fallback-state">
+                    <span class="fallback-url-text">ecmsystems.github.io/Demo-bot</span>
+                    <a href="https://ecmsystems.github.io/Demo-bot" target="_blank" rel="noopener noreferrer" class="fallback-open-link">Открыть живой стенд ↗</a>
+                  </div>
+                </div>
+
+                <!-- Канал 2: Telegram-бот (реалистичный монохромный мокап) -->
+                <div id="view-channel-tg" class="channel-view" role="tabpanel">
+                  <div class="tg-mockup">
+                    <!-- Верхняя шапка Telegram -->
+                    <div class="tg-mockup-header">
+                      <div class="tg-avatar">ECM</div>
+                      <div class="tg-header-info">
+                        <div class="tg-bot-title">ECM Demo Bot</div>
+                        <a href="https://t.me/ecm_systems_demo_bot" target="_blank" rel="noopener noreferrer" class="tg-bot-user">@ecm_systems_demo_bot</a>
+                      </div>
+                      <a href="https://t.me/ecm_systems_demo_bot" target="_blank" rel="noopener noreferrer" class="tg-header-link" title="Открыть диалог">↗</a>
+                    </div>
+
+                    <!-- Лента сообщений -->
+                    <div class="tg-messages-scroll">
+                      <!-- 1. Сообщение клиента -->
+                      <div class="tg-msg tg-msg-user">
+                        <div class="tg-bubble tg-bubble-user">
+                          Сколько будет оклеить морду на бмв 3 в полиуретан?
+                          <span class="tg-time">14:20</span>
+                        </div>
+                      </div>
+
+                      <!-- 2. Ответ бота -->
+                      <div class="tg-msg tg-msg-bot">
+                        <div class="tg-bubble tg-bubble-bot">
+                          <div class="tg-calc-lead"><strong>BMW 3er</strong> (Седан / D-класс) · Комплекс «Зона риска»</div>
+                          <div class="tg-calc-details">Капот, передний бампер, крылья, фары, зеркала.</div>
+                          <div class="tg-price-badge">
+                            <span>Расчет:</span> <strong>от 75 000 ₽</strong>
+                            <span class="tg-calc-note">(190 мкм, 5 лет)</span>
+                          </div>
+                          <div class="tg-upsell">+ антидождь на лобовое в подарок при бронировании</div>
+
+                          <!-- Инлайн-кнопки бота -->
+                          <div class="tg-inline-keyboard">
+                            <a href="https://t.me/ecm_systems_demo_bot" target="_blank" rel="noopener noreferrer" class="tg-inline-btn">Выбрать свободное окно</a>
+                            <a href="https://t.me/ecm_systems_demo_bot" target="_blank" rel="noopener noreferrer" class="tg-inline-btn">Добавить керамику</a>
+                          </div>
+                          <span class="tg-time">14:20</span>
+                        </div>
+                      </div>
+                    </div>
+
+                    <!-- Нижняя плашка-призыв -->
+                    <a href="https://t.me/ecm_systems_demo_bot" target="_blank" rel="noopener noreferrer" class="tg-mockup-footer">
+                      <span>Протестировать бота вживую — <span class="mono">@ecm_systems_demo_bot</span> ↗</span>
+                    </a>
+                  </div>
                 </div>
               </div>
             </div>
@@ -773,21 +1235,40 @@
             <div class="case-content-side">
               <div>
                 <div class="case-meta">Сервисный бизнес · Виджет + Telegram</div>
-                <h3 class="case-title">ИИ-продавец с расчетом цены и записью</h3>
+                <h3 class="case-title">ИИ-продавец: веб-виджет и Telegram-бот на одном ядре</h3>
                 <p class="case-intro">
-                  Автономная система обработки заявок для сервисных компаний и онлайн-школ (флагманская сборка — под детейлинг-студии).
+                  Автономная система обработки заявок для сервисного бизнеса: веб-виджет на сайт и синхронизированный Telegram-бот работают на общей LLM-логике, рассчитывают сметы по прайсу и собирают квалифицированные лиды в единую базу.
                 </p>
 
                 <ul class="case-bullets">
                   <li>Подключение одной строкой (widget.js) с изоляцией через Shadow DOM — не конфликтует со стилями Tilda, WordPress и кастомной версткой.</li>
-                  <li>Смена тем под брендбук сайта, динамический расчет заказ-наряда и мягкие допродажи прямо в диалоге.</li>
-                  <li>Единая связка сайта и Telegram-бота, запись в SQLite и Google Sheets, стабильная работа в РФ без VPN.</li>
+                  <li>Telegram-бот (@ecm_systems_demo_bot) отвечает клиентам с той же логикой расчета и записи, что и виджет на сайте, синхронизируя лиды в одну базу.</li>
+                  <li>Динамический расчет заказ-наряда, мягкие допродажи прямо в диалоге, запись в SQLite и Google Sheets, стабильная работа в РФ без VPN.</li>
                 </ul>
 
-                <!-- Интерактивный код -->
-                <div class="code-embed-row">
-                  <span class="code-snippet">&lt;script src="widget.js" data-shadow-dom="true"&gt;&lt;/script&gt;</span>
-                  <button type="button" class="btn-copy-code" data-copy='<script src="widget.js" data-shadow-dom="true"></script>'>Копировать</button>
+                <!-- Двухуровневый инженерный блок интеграции «Сайт + Telegram» -->
+                <div class="integration-embed-box">
+                  <!-- Строка 1: WEB -->
+                  <div class="integration-row">
+                    <div class="integration-left">
+                      <span class="integration-badge">WEB</span>
+                      <span class="code-snippet">&lt;script src="widget.js" data-shadow-dom="true"&gt;&lt;/script&gt;</span>
+                    </div>
+                    <button type="button" class="btn-copy-code" data-copy='<script src="widget.js" data-shadow-dom="true"></script>'>Копировать</button>
+                  </div>
+
+                  <!-- Строка 2: Telegram -->
+                  <div class="integration-row">
+                    <div class="integration-left">
+                      <span class="integration-badge">TG</span>
+                      <a href="https://t.me/ecm_systems_demo_bot" target="_blank" rel="noopener noreferrer" class="integration-tg-handle">@ecm_systems_demo_bot</a>
+                      <span class="integration-note">· единое ядро и база</span>
+                    </div>
+                    <div class="integration-actions">
+                      <button type="button" class="btn-copy-code" data-copy="@ecm_systems_demo_bot">Копировать</button>
+                      <a href="https://t.me/ecm_systems_demo_bot" target="_blank" rel="noopener noreferrer" class="btn-open-link">Открыть ↗</a>
+                    </div>
+                  </div>
                 </div>
               </div>
 
@@ -811,7 +1292,7 @@
                 <video class="case-video" src="demo-1.mp4" poster="og-image.png" controls muted playsinline preload="metadata"></video>
                 <div class="video-fallback-state">
                   <span class="fallback-url-text">ecmsystems.github.io/NordicMoution-bot-demo</span>
-                  <a href="https://ecmsystems.github.io/NordicMoution-bot-demo/" target="_blank" rel="noopener noreferrer" class="fallback-open-link">Открыть 3D-демо ↗</a>
+                  <a href="https://ecmsystems.github.io/NordicMoution-bot-demo/" target="_blank" rel="noopener noreferrer" class="fallback-open-link">Открыть демо-витрину ↗</a>
                 </div>
               </div>
             </div>
@@ -819,25 +1300,31 @@
             <!-- Описание кейса -->
             <div class="case-content-side">
               <div>
-                <div class="case-meta">E-commerce &amp; 3D · Shopify / Кастом</div>
-                <h3 class="case-title">3D-витрина и AI Sizing Concierge</h3>
+                <div class="case-meta">E-commerce · Витрина + AI-виджет</div>
+                <h3 class="case-title">AI Sizing Concierge и кастомная витрина для e-commerce</h3>
                 <p class="case-intro">
-                  Встраиваемый виджет подбора размера и консультации для интернет-магазинов одежды, обуви и брендов с нестандартным кроем.
+                  Встраиваемый виджет подбора размера и интерактивная карточка товара для интернет-магазинов одежды, обуви и брендов со сложной размерной сеткой.
                 </p>
 
                 <ul class="case-bullets">
                   <li>Подбирает точный размер по росту, весу и посадке за 5 секунд прямо над кнопкой покупки.</li>
-                  <li>Интерактивный 3D-фронтенд и ручная стилизация интерфейса под шрифты, цвета и сетку магазина.</li>
+                  <li>Кастомная верстка карточки товара со 100% нативной стилизацией интерфейса под шрифты, цвета и сетку магазина.</li>
                   <li>Автоматическая передача заявок и параметров клиентов в Google Sheets или CRM.</li>
                 </ul>
+
+                <!-- Одиночная строка кода -->
+                <div class="code-embed-row">
+                  <span class="code-snippet">&lt;script src="sizing-concierge.js" data-brand="nordic"&gt;&lt;/script&gt;</span>
+                  <button type="button" class="btn-copy-code" data-copy='<script src="sizing-concierge.js" data-brand="nordic"></script>'>Копировать</button>
+                </div>
               </div>
 
               <div>
                 <div class="tech-stack-line">
-                  Python · FastAPI · Gemini API · Vanilla JS · 3D Frontend · Google Sheets
+                  Python · FastAPI · Gemini API · Vanilla JS · Shadow DOM · Google Sheets
                 </div>
                 <div class="case-button-row">
-                  <a href="https://ecmsystems.github.io/NordicMoution-bot-demo/" target="_blank" rel="noopener noreferrer" class="btn-card-primary">Открыть 3D-демо ↗</a>
+                  <a href="https://ecmsystems.github.io/NordicMoution-bot-demo/" target="_blank" rel="noopener noreferrer" class="btn-card-primary">Открыть демо-витрину ↗</a>
                 </div>
               </div>
             </div>
@@ -911,32 +1398,59 @@
   </footer>
 
   <!-- ==========================================================================
-       6. VANILLA JS (СНИППЕТ, ФОЛБЭК ВИДЕО И ПЛАВНЫЕ ТАКТИЛЬНЫЕ СЛОИ)
+       6. VANILLA JS (СНИППЕТЫ, ПЕРЕКЛЮЧАТЕЛЬ КАНАЛОВ И ТАКТИЛЬНЫЕ СЛОИ)
        ========================================================================== -->
   <script>
     (function () {
       'use strict';
 
-      // 1. Копирование сниппета кода
-      const copyBtn = document.querySelector('.btn-copy-code');
-      if (copyBtn) {
-        copyBtn.addEventListener('click', async () => {
-          const text = copyBtn.getAttribute('data-copy');
+      // 1. Копирование в буфер обмена (для сниппетов и юзернейма бота)
+      document.querySelectorAll('.btn-copy-code').forEach(btn => {
+        btn.addEventListener('click', async () => {
+          const text = btn.getAttribute('data-copy');
+          if (!text) return;
           try {
             await navigator.clipboard.writeText(text);
-            copyBtn.textContent = 'Скопировано';
-            copyBtn.classList.add('copied');
+            const originalText = btn.textContent;
+            btn.textContent = 'Скопировано';
+            btn.classList.add('copied');
             setTimeout(() => {
-              copyBtn.textContent = 'Копировать';
-              copyBtn.classList.remove('copied');
-            }, 2000);
+              btn.textContent = originalText;
+              btn.classList.remove('copied');
+            }, 1800);
           } catch (e) {
             console.error('Ошибка копирования:', e);
           }
         });
-      }
+      });
 
-      // 2. Обработка отсутствия или ошибки видеофайлов
+      // 2. Интерактивный переключатель каналов (Веб-виджет / Telegram-бот) в Кейсе №1
+      const channelTabs = document.querySelectorAll('.channel-tab-btn');
+      channelTabs.forEach(tab => {
+        tab.addEventListener('click', () => {
+          const channel = tab.getAttribute('data-channel');
+          channelTabs.forEach(t => {
+            const isActive = t === tab;
+            t.classList.toggle('is-active', isActive);
+            t.setAttribute('aria-selected', isActive ? 'true' : 'false');
+          });
+
+          const webView = document.getElementById('view-channel-web');
+          const tgView = document.getElementById('view-channel-tg');
+
+          if (webView && tgView) {
+            if (channel === 'tg') {
+              webView.classList.remove('is-active');
+              tgView.classList.add('is-active');
+            } else {
+              tgView.classList.remove('is-active');
+              webView.classList.add('is-active');
+            }
+          }
+        });
+      });
+
+      // 3. Обработка отсутствия или ошибки видеофайлов
       document.querySelectorAll('.case-video').forEach(video => {
         video.addEventListener('error', () => {
           video.style.display = 'none';
@@ -945,12 +1459,13 @@
         });
       });
 
-      // 3. ПРИГЛУШЕННЫЙ СВЕТ ЗА КУРСОРОМ И ПОДСВЕТКА ГРАНЕЙ КАРТОЧЕК
+      // 4. ТАКТИЛЬНЫЙ СВЕТ ЗА КУРСОРОМ, СКРЫТАЯ СЕТКА И БЛИК НА КАРТОЧКАХ
       const hasFinePointer = window.matchMedia('(pointer: fine)').matches;
       const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
       if (hasFinePointer && !prefersReducedMotion) {
         const glowEl = document.querySelector('.ambient-cursor-glow');
+        const gridEl = document.querySelector('.masked-micro-grid');
         const root = document.documentElement;
 
         let targetX = -1000;
@@ -961,6 +1476,7 @@
         let rafId = null;
 
         function updateGlowPosition() {
+          // Линейная интерполяция (lerp) с фактором 0.09 для плавного скольжения
           currentX += (targetX - currentX) * 0.09;
           currentY += (targetY - currentY) * 0.09;
 
@@ -981,6 +1497,7 @@
               currentY = targetY;
             }
             if (glowEl) glowEl.classList.add('is-active');
+            if (gridEl) gridEl.classList.add('is-active');
             if (!rafId) rafId = requestAnimationFrame(updateGlowPosition);
           }
         }, { passive: true });
@@ -988,9 +1505,10 @@
         document.addEventListener('mouseleave', () => {
           isCursorActive = false;
           if (glowEl) glowEl.classList.remove('is-active');
+          if (gridEl) gridEl.classList.remove('is-active');
         });
 
-        // Подсветка граней карточек кейсов при наведении
+        // Деликатная подсветка граней карточек кейсов при наведении
         const caseCards = document.querySelectorAll('.case-card');
         caseCards.forEach(card => {
           card.addEventListener('mousemove', (e) => {
