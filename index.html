@@ -34,10 +34,6 @@
       --font-code: 'IBM Plex Mono', monospace;
       --radius-sm: 6px;
       --radius-md: 8px;
-
-      /* Координаты свечения по умолчанию (за экраном до первого движения мыши) */
-      --glow-x: -1000px;
-      --glow-y: -1000px;
     }
 
     * {
@@ -84,78 +80,8 @@
       padding: 0 32px;
     }
 
-    /* Все семантические секции лежат выше фоновых слоев */
-    header, main, footer {
-      position: relative;
-      z-index: 1;
-    }
-
     /* ==========================================================================
-       2. ТАКТИЛЬНЫЕ ФОНОВЫЕ СЛОИ (AMBIENT GLOW, MASKED GRID, GRAIN)
-       ========================================================================== */
-
-    /* 4. Микро-текстура матового анодированного металла (Anti-Banding Grain) */
-    .anti-banding-grain {
-      position: fixed;
-      inset: 0;
-      pointer-events: none;
-      z-index: 0;
-      opacity: 0.025;
-      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
-      background-repeat: repeat;
-      will-change: transform;
-    }
-
-    /* 1. Плавный приглушенный свет за курсором (Ambient Cursor Glow) */
-    .ambient-cursor-glow {
-      position: fixed;
-      inset: 0;
-      pointer-events: none;
-      z-index: 0;
-      opacity: 0;
-      transition: opacity 0.6s cubic-bezier(0.16, 1, 0.3, 1);
-      background: radial-gradient(
-        580px circle at var(--glow-x) var(--glow-y),
-        rgba(255, 255, 255, 0.055) 0%,
-        rgba(255, 255, 255, 0.02) 40%,
-        transparent 100%
-      );
-      will-change: background;
-    }
-
-    /* 2. Скрытая инженерная сетка 48px, проявляемая светом (Masked Micro-Grid) */
-    .masked-micro-grid {
-      position: fixed;
-      inset: 0;
-      pointer-events: none;
-      z-index: 0;
-      opacity: 0;
-      transition: opacity 0.6s cubic-bezier(0.16, 1, 0.3, 1);
-      background-size: 48px 48px;
-      background-image:
-        linear-gradient(to right, rgba(255, 255, 255, 0.045) 1px, transparent 1px),
-        linear-gradient(to bottom, rgba(255, 255, 255, 0.045) 1px, transparent 1px);
-      -webkit-mask-image: radial-gradient(320px circle at var(--glow-x) var(--glow-y), black 0%, transparent 100%);
-      mask-image: radial-gradient(320px circle at var(--glow-x) var(--glow-y), black 0%, transparent 100%);
-      will-change: mask-image, -webkit-mask-image;
-    }
-
-    @media (pointer: fine) and (prefers-reduced-motion: no-preference) {
-      .ambient-cursor-glow.is-active,
-      .masked-micro-grid.is-active {
-        opacity: 1;
-      }
-    }
-
-    @media (pointer: coarse), (prefers-reduced-motion: reduce) {
-      .ambient-cursor-glow,
-      .masked-micro-grid {
-        display: none !important;
-      }
-    }
-
-    /* ==========================================================================
-       3. ШАПКА (ЛЕГКАЯ, ЧИСТАЯ, БЕЗ ЛИШНИХ КОРОБОК)
+       2. ШАПКА (ЛЕГКАЯ, ЧИСТАЯ, БЕЗ ЛИШНИХ КОРОБОК)
        ========================================================================== */
     header {
       height: 72px;
@@ -748,11 +674,6 @@
 </head>
 <body>
 
-  <!-- ФОНОВЫЕ СЛОИ (ЗЕРНИСТОСТЬ МАТОВОГО МЕТАЛЛА, СВЕТ ЗА КУРСОРОМ И СКРЫТАЯ СЕТКА) -->
-  <div class="anti-banding-grain" aria-hidden="true"></div>
-  <div class="ambient-cursor-glow" aria-hidden="true"></div>
-  <div class="masked-micro-grid" aria-hidden="true"></div>
-
   <!-- ==========================================================================
        1. ШАПКА
        ========================================================================== -->
@@ -982,57 +903,9 @@
         });
       });
 
-      // 3. ТАКТИЛЬНЫЙ СВЕТ И СЕТКА ТОЛЬКО ДЛЯ УСТРОЙСТВ С МЫШЬЮ
+      // 3. Деликатная подсветка граней карточек кейсов при наведении
       const hasFinePointer = window.matchMedia('(pointer: fine)').matches;
-      const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-
-      if (hasFinePointer && !prefersReducedMotion) {
-        const glowEl = document.querySelector('.ambient-cursor-glow');
-        const gridEl = document.querySelector('.masked-micro-grid');
-        const root = document.documentElement;
-
-        let targetX = -1000;
-        let targetY = -1000;
-        let currentX = -1000;
-        let currentY = -1000;
-        let isCursorActive = false;
-        let rafId = null;
-
-        function updateGlowPosition() {
-          // Линейная интерполяция (lerp) с инерцией 0.09 для шелковистого скольжения
-          currentX += (targetX - currentX) * 0.09;
-          currentY += (targetY - currentY) * 0.09;
-
-          root.style.setProperty('--glow-x', `${currentX.toFixed(1)}px`);
-          root.style.setProperty('--glow-y', `${currentY.toFixed(1)}px`);
-
-          // Продолжаем цикл анимации
-          rafId = requestAnimationFrame(updateGlowPosition);
-        }
-
-        window.addEventListener('mousemove', (e) => {
-          targetX = e.clientX;
-          targetY = e.clientY;
-
-          if (!isCursorActive) {
-            isCursorActive = true;
-            if (currentX < -500) {
-              currentX = targetX;
-              currentY = targetY;
-            }
-            if (glowEl) glowEl.classList.add('is-active');
-            if (gridEl) gridEl.classList.add('is-active');
-            if (!rafId) rafId = requestAnimationFrame(updateGlowPosition);
-          }
-        }, { passive: true });
-
-        document.addEventListener('mouseleave', () => {
-          isCursorActive = false;
-          if (glowEl) glowEl.classList.remove('is-active');
-          if (gridEl) gridEl.classList.remove('is-active');
-        });
-
-        // 4. ДЕЛИКАТНАЯ ПОДСВЕТКА ГРАНЕЙ И ПОВЕРХНОСТИ НА КАРТОЧКАХ КЕЙСОВ
+      if (hasFinePointer) {
         const caseCards = document.querySelectorAll('.case-card');
         caseCards.forEach(card => {
           card.addEventListener('mousemove', (e) => {
