@@ -111,7 +111,7 @@
       will-change: background;
     }
 
-    /* Архитектурная микро-сетка 48px, проявляемая строго в ореоле света курсора */
+    /* Традиционный геометрический узор Асаноха (Asanoha), проявляемый в ореоле света курсора */
     .masked-micro-grid {
       position: fixed;
       inset: 0;
@@ -119,10 +119,9 @@
       z-index: 0;
       opacity: 0;
       transition: opacity 0.6s cubic-bezier(0.16, 1, 0.3, 1);
-      background-size: 48px 48px;
-      background-image:
-        linear-gradient(to right, rgba(255, 255, 255, 0.035) 1px, transparent 1px),
-        linear-gradient(to bottom, rgba(255, 255, 255, 0.035) 1px, transparent 1px);
+      background-size: 80px 138.56px;
+      background-repeat: repeat;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='80' height='138.56' viewBox='0 0 80 138.56'%3E%3Cg fill='none' stroke='%23ffffff' stroke-opacity='0.11' stroke-width='0.75'%3E%3Cpath d='M0 0 H80 M0 69.28 H80 M0 138.56 H80'/%3E%3Cpath d='M0 0 L40 69.28 L80 0 M0 138.56 L40 69.28 L80 138.56'/%3E%3Cpath d='M40 23.09 V115.47 M0 0 V46.19 M80 0 V46.19 M0 92.37 V138.56 M80 92.37 V138.56'/%3E%3Cpath d='M0 0 L40 23.09 L80 0 M0 46.19 L40 69.28 L80 46.19 M0 92.37 L40 69.28 L80 92.37 M0 138.56 L40 115.47 L80 138.56'/%3E%3C/g%3E%3C/svg%3E");
       -webkit-mask-image: radial-gradient(320px circle at var(--glow-x) var(--glow-y), black 0%, transparent 100%);
       mask-image: radial-gradient(320px circle at var(--glow-x) var(--glow-y), black 0%, transparent 100%);
       will-change: mask-image, -webkit-mask-image;
