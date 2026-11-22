@@ -32,8 +32,8 @@
       --accent-contrast: #0B0B0C;
       --font-main: 'Golos Text', -apple-system, BlinkMacSystemFont, sans-serif;
       --font-code: 'IBM Plex Mono', monospace;
-      --radius-sm: 6px;
-      --radius-md: 8px;
+      --radius-sm: 8px;
+      --radius-md: 16px;
 
       /* Координаты свечения по умолчанию (за экраном до первого движения мыши) */
       --glow-x: -1000px;
@@ -91,7 +91,7 @@
     }
 
     /* ==========================================================================
-       2. ТАКТИЛЬНЫЕ ФОНОВЫЕ СЛОИ (СВЕТ ЗА КУРСОРОМ И СКРЫТАЯ СЕТКА)
+       2. ТАКТИЛЬНЫЕ ФОНОВЫЕ СЛОИ (СВЕТ ЗА КУРСОРОМ И УЗОР АСАНОХА)
        ========================================================================== */
 
     /* Приглушенный рассеянный свет за курсором (Ambient Cursor Glow) */
@@ -142,61 +142,87 @@
     }
 
     /* ==========================================================================
-       3. ШАПКА (ЛЕГКАЯ, ЧИСТАЯ, БЕЗ ЛИШНИХ КОРОБОК)
+       3. ПАРЯЩИЙ ВЕРХНИЙ БАР (FLOATING LIQUID GLASS NAVBAR)
        ========================================================================== */
     header {
-      height: 72px;
-      border-bottom: 1px solid var(--border);
       position: sticky;
-      top: 0;
+      top: 16px;
       z-index: 50;
-      background-color: rgba(11, 11, 12, 0.94);
-      backdrop-filter: blur(12px);
-      -webkit-backdrop-filter: blur(12px);
+      pointer-events: none;
+      width: 100%;
     }
 
     .header-inner {
-      height: 100%;
+      pointer-events: auto;
+      max-width: 1080px;
+      margin: 0 auto;
+      height: 56px;
+      padding: 0 22px;
+      border-radius: 999px;
+      background: linear-gradient(180deg, rgba(255, 255, 255, 0.075) 0%, rgba(18, 18, 21, 0.55) 100%);
+      backdrop-filter: blur(22px) saturate(160%) brightness(1.06);
+      -webkit-backdrop-filter: blur(22px) saturate(160%) brightness(1.06);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      box-shadow:
+        inset 0 1px 0 0 rgba(255, 255, 255, 0.24),
+        inset 0 -1px 0 0 rgba(255, 255, 255, 0.05),
+        0 12px 32px rgba(0, 0, 0, 0.45);
       display: flex;
       justify-content: space-between;
       align-items: center;
-      gap: 20px;
+      gap: 16px;
     }
 
     .brand-name {
-      font-size: 15px;
+      font-size: 14.5px;
       font-weight: 500;
       letter-spacing: -0.01em;
       color: var(--text);
+      padding: 6px 4px;
+      display: inline-flex;
+      align-items: center;
     }
 
     .header-nav {
       display: flex;
       align-items: center;
-      gap: 28px;
+      gap: 6px;
     }
 
     .nav-link {
-      font-size: 14px;
+      font-size: 13.5px;
       font-weight: 400;
       color: var(--text-secondary);
-      transition: color 0.2s ease;
+      padding: 6px 14px;
+      border-radius: 999px;
+      transition: color 0.2s ease, background-color 0.2s ease;
+      white-space: nowrap;
     }
 
     .nav-link:hover {
       color: var(--text);
+      background-color: rgba(255, 255, 255, 0.08);
     }
 
     .nav-tg {
       color: var(--text);
       font-weight: 500;
+      background-color: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      box-shadow: inset 0 1px 0 0 rgba(255, 255, 255, 0.14);
+    }
+
+    .nav-tg:hover {
+      background-color: rgba(255, 255, 255, 0.12);
+      border-color: rgba(255, 255, 255, 0.18);
+      box-shadow: inset 0 1px 0 0 rgba(255, 255, 255, 0.22);
     }
 
     /* ==========================================================================
-       4. СЕКЦИЯ HERO (КОМПАКТНАЯ, ВЫВЕРЕННАЯ ТИПОГРАФИКА)
+       4. СЕКЦИЯ HERO (ВЫВЕРЕННАЯ ТИПОГРАФИКА)
        ========================================================================== */
     .hero {
-      padding-top: 88px;
+      padding-top: 68px;
       padding-bottom: 72px;
     }
 
@@ -226,7 +252,7 @@
       gap: 16px;
     }
 
-    /* Спокойные кнопки */
+    /* Главная контрастная светлая кнопка с объемом */
     .btn-action-primary {
       display: inline-flex;
       align-items: center;
@@ -234,18 +260,25 @@
       padding: 12px 22px;
       font-size: 14px;
       font-weight: 500;
-      color: var(--accent-contrast);
-      background-color: var(--accent);
+      color: #0B0B0C;
+      background: linear-gradient(180deg, #FFFFFF 0%, #E8E8EC 100%);
       border-radius: var(--radius-sm);
-      border: 1px solid var(--accent);
-      transition: opacity 0.2s ease, transform 0.2s ease;
+      border: 1px solid rgba(255, 255, 255, 0.35);
+      box-shadow:
+        inset 0 1px 0 0 rgba(255, 255, 255, 0.95),
+        0 8px 24px rgba(0, 0, 0, 0.45);
+      transition: opacity 0.2s ease, transform 0.2s ease, box-shadow 0.2s ease;
     }
 
     .btn-action-primary:hover {
-      opacity: 0.92;
+      opacity: 0.96;
       transform: translateY(-1px);
+      box-shadow:
+        inset 0 1px 0 0 #FFFFFF,
+        0 10px 28px rgba(0, 0, 0, 0.5);
     }
 
+    /* Вторичная кнопка Liquid Glass */
     .btn-action-secondary {
       display: inline-flex;
       align-items: center;
@@ -254,19 +287,28 @@
       font-size: 14px;
       font-weight: 500;
       color: var(--text);
-      background-color: transparent;
+      background: rgba(255, 255, 255, 0.05);
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
       border-radius: var(--radius-sm);
-      border: 1px solid var(--border);
-      transition: border-color 0.2s ease, background-color 0.2s ease;
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      box-shadow:
+        inset 0 1px 0 0 rgba(255, 255, 255, 0.22),
+        0 4px 14px rgba(0, 0, 0, 0.25);
+      transition: background-color 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease, transform 0.2s ease;
     }
 
     .btn-action-secondary:hover {
-      border-color: var(--border-hover);
-      background-color: var(--surface);
+      background-color: rgba(255, 255, 255, 0.09);
+      border-color: rgba(255, 255, 255, 0.2);
+      box-shadow:
+        inset 0 1px 0 0 rgba(255, 255, 255, 0.32),
+        0 6px 18px rgba(0, 0, 0, 0.35);
+      transform: translateY(-1px);
     }
 
     /* ==========================================================================
-       5. СЕКЦИЯ КЕЙСОВ (#cases) И ПОДСВЕТКА ГРАНЕЙ (CARD EDGE HIGHLIGHT)
+       5. СЕКЦИЯ КЕЙСОВ (#cases) В СТИЛЕ SMOKY LIQUID GLASS
        ========================================================================== */
     .section-divider {
       border-top: 1px solid var(--border);
@@ -288,23 +330,33 @@
       margin-bottom: 112px;
     }
 
-    /* Деликатная подсветка граней и поверхности на карточках кейсов */
+    /* Карточки кейсов из дымчатого жидкого стекла */
     .case-card {
       display: grid;
       grid-template-columns: 55% 45%;
-      border: 1px solid var(--border);
+      border: 1px solid rgba(255, 255, 255, 0.1);
       border-radius: var(--radius-md);
-      background-color: var(--surface);
+      background:
+        linear-gradient(135deg, rgba(255, 255, 255, 0.05) 0%, rgba(255, 255, 255, 0.0) 45%, rgba(255, 255, 255, 0.025) 100%),
+        rgba(17, 17, 20, 0.52);
+      backdrop-filter: blur(18px) saturate(140%);
+      -webkit-backdrop-filter: blur(18px) saturate(140%);
       overflow: hidden;
       position: relative;
-      transition: border-color 0.2s ease;
+      box-shadow:
+        inset 0 1px 0 0 rgba(255, 255, 255, 0.18),
+        0 24px 48px -12px rgba(0, 0, 0, 0.55);
+      transition: border-color 0.25s ease, box-shadow 0.25s ease;
     }
 
     .case-card:hover {
-      border-color: var(--border-hover);
+      border-color: rgba(255, 255, 255, 0.18);
+      box-shadow:
+        inset 0 1px 0 0 rgba(255, 255, 255, 0.26),
+        0 30px 60px -15px rgba(0, 0, 0, 0.65);
     }
 
-    /* Тонкий блик по контуру рамки карточки (1px) в точке курсора */
+    /* Тонкий стеклянный блик по контуру фаски карточки (1px) в точке курсора */
     .case-card::before {
       content: "";
       position: absolute;
@@ -312,10 +364,10 @@
       border-radius: calc(var(--radius-md) + 1px);
       padding: 1px;
       background: radial-gradient(
-        380px circle at var(--card-x, -1000px) var(--card-y, -1000px),
-        rgba(255, 255, 255, 0.16) 0%,
-        rgba(255, 255, 255, 0.04) 50%,
-        transparent 100%
+        420px circle at var(--card-x, -1000px) var(--card-y, -1000px),
+        rgba(255, 255, 255, 0.28) 0%,
+        rgba(255, 255, 255, 0.08) 35%,
+        transparent 70%
       );
       -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
       -webkit-mask-composite: xor;
@@ -326,15 +378,16 @@
       z-index: 2;
     }
 
-    /* Деликатная подсветка поверхности карточки при приближении курсора */
+    /* Оптическое преломление света по поверхности стекла карточки */
     .case-card::after {
       content: "";
       position: absolute;
       inset: 0;
       border-radius: var(--radius-md);
       background: radial-gradient(
-        440px circle at var(--card-x, -1000px) var(--card-y, -1000px),
-        rgba(255, 255, 255, 0.04) 0%,
+        480px circle at var(--card-x, -1000px) var(--card-y, -1000px),
+        rgba(255, 255, 255, 0.05) 0%,
+        rgba(255, 255, 255, 0.015) 40%,
         transparent 100%
       );
       pointer-events: none;
@@ -355,22 +408,27 @@
       z-index: 3;
     }
 
-    /* Левая колонка превью */
+    /* Левая колонка превью со стеклянной базой */
     .case-media-side {
-      background-color: #080809;
+      background-color: rgba(10, 10, 13, 0.45);
       padding: 24px;
-      border-right: 1px solid var(--border);
+      border-right: 1px solid rgba(255, 255, 255, 0.08);
       display: flex;
       flex-direction: column;
       align-items: stretch;
       justify-content: center;
     }
 
-    /* Сегментированный переключатель каналов */
+    /* Сегментированный переключатель каналов (Liquid Glass Pill) */
     .channel-switch-wrap {
       display: inline-flex;
-      background-color: #121215;
-      border: 1px solid var(--border);
+      background: rgba(18, 18, 22, 0.55);
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      box-shadow:
+        inset 0 1px 0 0 rgba(255, 255, 255, 0.22),
+        0 4px 12px rgba(0, 0, 0, 0.25);
       border-radius: var(--radius-sm);
       padding: 3px;
       gap: 3px;
@@ -385,8 +443,8 @@
       font-weight: 500;
       color: var(--text-secondary);
       padding: 5px 14px;
-      border-radius: 4px;
-      transition: color 0.15s ease, background-color 0.15s ease, border-color 0.15s ease;
+      border-radius: 6px;
+      transition: color 0.15s ease, background-color 0.15s ease, border-color 0.15s ease, box-shadow 0.15s ease;
       text-align: center;
       border: 1px solid transparent;
       white-space: nowrap;
@@ -394,23 +452,30 @@
 
     .channel-tab-btn:hover {
       color: var(--text);
+      background-color: rgba(255, 255, 255, 0.05);
     }
 
     .channel-tab-btn.is-active {
-      color: var(--text);
-      background-color: #202024;
-      border-color: rgba(255, 255, 255, 0.12);
+      color: #ffffff;
+      background: rgba(255, 255, 255, 0.13);
+      border: 1px solid rgba(255, 255, 255, 0.18);
+      box-shadow:
+        inset 0 1px 0 0 rgba(255, 255, 255, 0.28),
+        0 2px 8px rgba(0, 0, 0, 0.3);
     }
 
-    /* Видовой блок с соотношением 16/10 */
+    /* Видовой блок с фиксированным соотношением 16/10 */
     .video-viewport {
       width: 100%;
       aspect-ratio: 16 / 10;
-      background-color: #0f0f11;
-      border: 1px solid var(--border);
+      background-color: rgba(13, 13, 16, 0.65);
+      border: 1px solid rgba(255, 255, 255, 0.1);
       border-radius: var(--radius-sm);
       overflow: hidden;
       position: relative;
+      box-shadow:
+        inset 0 1px 0 0 rgba(255, 255, 255, 0.12),
+        0 8px 24px rgba(0, 0, 0, 0.35);
     }
 
     /* Вкладки демонстрации внутри рамки */
@@ -442,7 +507,9 @@
       justify-content: center;
       padding: 24px;
       text-align: center;
-      background-color: #111114;
+      background-color: rgba(15, 15, 19, 0.85);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
       gap: 12px;
     }
 
@@ -466,12 +533,14 @@
     }
 
     /* ==========================================================================
-       МОНОХРОМНЫЙ МОКАП ТЕЛЕГРАМ-ДИАЛОГА (ЧИСТЫЙ HTML/CSS)
+       МОНОХРОМНЫЙ МОКАП ТЕЛЕГРАМ-ДИАЛОГА В СТЕКЛЯННОМ КОРПУСЕ
        ========================================================================== */
     .tg-mockup {
       width: 100%;
       height: 100%;
-      background-color: #0c0c0e;
+      background-color: rgba(12, 12, 15, 0.75);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
       display: flex;
       flex-direction: column;
       position: relative;
@@ -484,7 +553,9 @@
       align-items: center;
       gap: 10px;
       padding: 10px 14px;
-      background-color: rgba(19, 19, 21, 0.95);
+      background: rgba(19, 19, 23, 0.7);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
       border-bottom: 1px solid rgba(255, 255, 255, 0.08);
       flex-shrink: 0;
     }
@@ -493,8 +564,8 @@
       width: 28px;
       height: 28px;
       border-radius: 50%;
-      background-color: #222226;
-      border: 1px solid rgba(255, 255, 255, 0.12);
+      background-color: rgba(34, 34, 40, 0.9);
+      border: 1px solid rgba(255, 255, 255, 0.15);
       color: #F3F3F4;
       font-size: 10px;
       font-weight: 600;
@@ -582,17 +653,19 @@
     }
 
     .tg-bubble-user {
-      background-color: #232328;
-      border: 1px solid rgba(255, 255, 255, 0.1);
+      background-color: rgba(35, 35, 42, 0.85);
+      border: 1px solid rgba(255, 255, 255, 0.12);
       color: var(--text);
       border-radius: 12px 12px 3px 12px;
+      box-shadow: inset 0 1px 0 0 rgba(255, 255, 255, 0.15);
     }
 
     .tg-bubble-bot {
-      background-color: #17171a;
-      border: 1px solid rgba(255, 255, 255, 0.08);
+      background-color: rgba(23, 23, 28, 0.85);
+      border: 1px solid rgba(255, 255, 255, 0.09);
       color: var(--text);
       border-radius: 12px 12px 12px 3px;
+      box-shadow: inset 0 1px 0 0 rgba(255, 255, 255, 0.1);
     }
 
     .tg-calc-lead {
@@ -613,8 +686,8 @@
       align-items: baseline;
       gap: 6px;
       padding: 5px 8px;
-      background-color: rgba(255, 255, 255, 0.04);
-      border: 1px solid rgba(255, 255, 255, 0.07);
+      background-color: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.08);
       border-radius: 4px;
       margin-bottom: 6px;
       font-size: 12px;
@@ -652,13 +725,15 @@
       color: var(--text);
       background-color: rgba(255, 255, 255, 0.06);
       border: 1px solid rgba(255, 255, 255, 0.1);
+      box-shadow: inset 0 1px 0 0 rgba(255, 255, 255, 0.12);
       border-radius: 4px;
-      transition: background-color 0.15s ease, border-color 0.15s ease;
+      transition: background-color 0.15s ease, border-color 0.15s ease, box-shadow 0.15s ease;
     }
 
     .tg-inline-btn:hover {
       background-color: rgba(255, 255, 255, 0.12);
       border-color: rgba(255, 255, 255, 0.2);
+      box-shadow: inset 0 1px 0 0 rgba(255, 255, 255, 0.22);
     }
 
     .tg-time {
@@ -674,7 +749,9 @@
       align-items: center;
       justify-content: center;
       padding: 8px 12px;
-      background-color: rgba(19, 19, 21, 0.95);
+      background: rgba(19, 19, 23, 0.7);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
       border-top: 1px solid rgba(255, 255, 255, 0.08);
       font-size: 12px;
       color: var(--text-secondary);
@@ -685,7 +762,7 @@
 
     .tg-mockup-footer:hover {
       color: var(--text);
-      background-color: #19191d;
+      background-color: rgba(25, 25, 30, 0.85);
     }
 
     .tg-mockup-footer .mono {
@@ -747,13 +824,18 @@
       color: var(--text-muted);
     }
 
-    /* Двухуровневый инженерный блок интеграции «Сайт + Telegram» */
+    /* Двухуровневый инженерный блок интеграции «Сайт + Telegram» (Liquid Glass) */
     .integration-embed-box {
-      background-color: var(--bg);
-      border: 1px solid var(--border);
+      background: rgba(18, 18, 22, 0.52);
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+      border: 1px solid rgba(255, 255, 255, 0.12);
       border-radius: var(--radius-sm);
       overflow: hidden;
       margin-bottom: 18px;
+      box-shadow:
+        inset 0 1px 0 0 rgba(255, 255, 255, 0.22),
+        0 4px 16px rgba(0, 0, 0, 0.25);
     }
 
     .integration-row {
@@ -782,9 +864,9 @@
       font-weight: 500;
       color: var(--text-muted);
       padding: 2px 6px;
-      background-color: rgba(255, 255, 255, 0.04);
-      border: 1px solid rgba(255, 255, 255, 0.06);
-      border-radius: 3px;
+      background-color: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 4px;
       flex-shrink: 0;
       letter-spacing: 0.04em;
     }
@@ -825,26 +907,35 @@
       user-select: all;
     }
 
+    /* Кнопки копирования и открытия в стиле Liquid Glass Pill */
     .btn-copy-code {
       font-size: 12px;
       font-weight: 400;
       color: var(--text-secondary);
       padding: 4px 8px;
-      border: 1px solid var(--border);
+      border: 1px solid rgba(255, 255, 255, 0.12);
       border-radius: 4px;
-      background-color: var(--surface);
+      background: rgba(255, 255, 255, 0.05);
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+      box-shadow: inset 0 1px 0 0 rgba(255, 255, 255, 0.22);
       white-space: nowrap;
-      transition: color 0.15s ease, border-color 0.15s ease;
+      transition: color 0.15s ease, background-color 0.15s ease, border-color 0.15s ease, box-shadow 0.15s ease, transform 0.15s ease;
     }
 
     .btn-copy-code:hover {
       color: var(--text);
-      border-color: var(--border-hover);
+      background-color: rgba(255, 255, 255, 0.09);
+      border-color: rgba(255, 255, 255, 0.2);
+      box-shadow: inset 0 1px 0 0 rgba(255, 255, 255, 0.32);
+      transform: translateY(-1px);
     }
 
     .btn-copy-code.copied {
       color: var(--text);
-      border-color: var(--text-secondary);
+      border-color: rgba(255, 255, 255, 0.25);
+      background-color: rgba(255, 255, 255, 0.14);
+      box-shadow: inset 0 1px 0 0 rgba(255, 255, 255, 0.35);
     }
 
     .btn-open-link {
@@ -852,29 +943,40 @@
       font-weight: 400;
       color: var(--text-secondary);
       padding: 4px 8px;
-      border: 1px solid var(--border);
+      border: 1px solid rgba(255, 255, 255, 0.12);
       border-radius: 4px;
-      background-color: var(--surface);
+      background: rgba(255, 255, 255, 0.05);
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+      box-shadow: inset 0 1px 0 0 rgba(255, 255, 255, 0.22);
       white-space: nowrap;
-      transition: color 0.15s ease, border-color 0.15s ease;
+      transition: color 0.15s ease, background-color 0.15s ease, border-color 0.15s ease, box-shadow 0.15s ease, transform 0.15s ease;
     }
 
     .btn-open-link:hover {
       color: var(--text);
-      border-color: var(--border-hover);
+      background-color: rgba(255, 255, 255, 0.09);
+      border-color: rgba(255, 255, 255, 0.2);
+      box-shadow: inset 0 1px 0 0 rgba(255, 255, 255, 0.32);
+      transform: translateY(-1px);
     }
 
-    /* Одиночная строка кода для второго кейса */
+    /* Одиночная строка кода для второго кейса (Liquid Glass) */
     .code-embed-row {
       display: flex;
       align-items: center;
       justify-content: space-between;
       gap: 12px;
       padding: 8px 12px;
-      background-color: var(--bg);
-      border: 1px solid var(--border);
+      background: rgba(18, 18, 22, 0.52);
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+      border: 1px solid rgba(255, 255, 255, 0.12);
       border-radius: var(--radius-sm);
       margin-bottom: 18px;
+      box-shadow:
+        inset 0 1px 0 0 rgba(255, 255, 255, 0.22),
+        0 4px 16px rgba(0, 0, 0, 0.25);
     }
 
     /* Стек одной строкой */
@@ -883,7 +985,7 @@
       color: var(--text-muted);
       line-height: 1.5;
       padding-top: 14px;
-      border-top: 1px solid var(--border);
+      border-top: 1px solid rgba(255, 255, 255, 0.08);
     }
 
     .case-button-row {
@@ -899,30 +1001,46 @@
       font-weight: 500;
       color: var(--text);
       padding: 8px 14px;
-      background-color: transparent;
-      border: 1px solid var(--border);
+      background: rgba(255, 255, 255, 0.05);
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+      border: 1px solid rgba(255, 255, 255, 0.12);
       border-radius: var(--radius-sm);
-      transition: border-color 0.2s ease, background-color 0.2s ease;
+      box-shadow:
+        inset 0 1px 0 0 rgba(255, 255, 255, 0.22),
+        0 4px 12px rgba(0, 0, 0, 0.25);
+      transition: background-color 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease, transform 0.2s ease;
     }
 
     .btn-card-link:hover {
-      border-color: var(--border-hover);
-      background-color: var(--surface-subtle);
+      background-color: rgba(255, 255, 255, 0.09);
+      border-color: rgba(255, 255, 255, 0.2);
+      box-shadow:
+        inset 0 1px 0 0 rgba(255, 255, 255, 0.32),
+        0 6px 16px rgba(0, 0, 0, 0.35);
+      transform: translateY(-1px);
     }
 
     .btn-card-primary {
       font-size: 13.5px;
       font-weight: 500;
-      color: var(--accent-contrast);
-      background-color: var(--accent);
+      color: #0B0B0C;
+      background: linear-gradient(180deg, #FFFFFF 0%, #E8E8EC 100%);
       padding: 8px 14px;
-      border: 1px solid var(--accent);
+      border: 1px solid rgba(255, 255, 255, 0.35);
       border-radius: var(--radius-sm);
-      transition: opacity 0.2s ease;
+      box-shadow:
+        inset 0 1px 0 0 rgba(255, 255, 255, 0.95),
+        0 6px 18px rgba(0, 0, 0, 0.4);
+      transition: opacity 0.2s ease, transform 0.2s ease, box-shadow 0.2s ease;
     }
 
     .btn-card-primary:hover {
-      opacity: 0.92;
+      opacity: 0.96;
+      transform: translateY(-1px);
+      box-shadow:
+        inset 0 1px 0 0 #FFFFFF,
+        0 8px 22px rgba(0, 0, 0, 0.45);
     }
 
     /* ==========================================================================
@@ -1006,16 +1124,23 @@
       padding: 11px 20px;
       font-size: 14px;
       font-weight: 500;
-      color: var(--accent-contrast);
-      background-color: var(--accent);
+      color: #0B0B0C;
+      background: linear-gradient(180deg, #FFFFFF 0%, #E8E8EC 100%);
       border-radius: var(--radius-sm);
-      border: 1px solid var(--accent);
+      border: 1px solid rgba(255, 255, 255, 0.35);
+      box-shadow:
+        inset 0 1px 0 0 rgba(255, 255, 255, 0.95),
+        0 8px 24px rgba(0, 0, 0, 0.45);
       white-space: nowrap;
-      transition: opacity 0.2s ease;
+      transition: opacity 0.2s ease, transform 0.2s ease, box-shadow 0.2s ease;
     }
 
     .footer-btn-tg:hover {
-      opacity: 0.92;
+      opacity: 0.96;
+      transform: translateY(-1px);
+      box-shadow:
+        inset 0 1px 0 0 #FFFFFF,
+        0 10px 28px rgba(0, 0, 0, 0.5);
     }
 
     .footer-bottom-line {
@@ -1036,7 +1161,7 @@
 
       .case-media-side {
         border-right: none;
-        border-bottom: 1px solid var(--border);
+        border-bottom: 1px solid rgba(255, 255, 255, 0.08);
         padding: 18px;
       }
 
@@ -1052,28 +1177,42 @@
 
     @media (max-width: 640px) {
       .container {
-        padding: 0 20px;
+        padding: 0 16px;
       }
 
       header {
-        height: 64px;
+        top: 12px;
+      }
+
+      .header-inner {
+        height: 50px;
+        padding: 0 14px;
       }
 
       .header-nav {
-        gap: 16px;
+        gap: 6px;
       }
 
       .nav-link:not(.nav-tg) {
         display: none;
       }
 
+      .nav-link {
+        font-size: 13px;
+        padding: 5px 12px;
+      }
+
+      .brand-name {
+        font-size: 14px;
+      }
+
       .hero {
-        padding-top: 56px;
+        padding-top: 48px;
         padding-bottom: 48px;
       }
 
       h1.hero-title {
-        font-size: 30px;
+        font-size: 29px;
       }
 
       .hero-lead {
@@ -1104,25 +1243,42 @@
         gap: 8px;
       }
     }
+
+    @media (max-width: 380px) {
+      .header-inner {
+        padding: 0 10px;
+      }
+
+      .brand-name {
+        font-size: 13.5px;
+      }
+
+      .nav-tg {
+        font-size: 12px;
+        padding: 4px 10px;
+      }
+    }
   </style>
 </head>
 <body>
 
-  <!-- ТАКТИЛЬНЫЕ ФОНОВЫЕ СЛОИ (ПРИГЛУШЕННЫЙ СВЕТ И ПРОЯВЛЯЮЩАЯСЯ СЕТКА) -->
+  <!-- ТАКТИЛЬНЫЕ ФОНОВЫЕ СЛОИ (ПРИГЛУШЕННЫЙ СВЕТ И УЗОР АСАНОХА) -->
   <div class="ambient-cursor-glow" aria-hidden="true"></div>
   <div class="masked-micro-grid" aria-hidden="true"></div>
 
   <!-- ==========================================================================
-       1. ШАПКА
+       1. ШАПКА (ПАРЯЩАЯ СТЕКЛЯННАЯ КАПСУЛА)
        ========================================================================== -->
   <header>
-    <div class="container header-inner">
-      <a href="#" class="brand-name">ECM Systems</a>
-      <nav class="header-nav" aria-label="Навигация по странице">
-        <a href="#cases" class="nav-link">Кейсы</a>
-        <a href="#info" class="nav-link">Стек и условия</a>
-        <a href="https://t.me/godblessed77" target="_blank" rel="noopener noreferrer" class="nav-link nav-tg">Telegram ↗</a>
-      </nav>
+    <div class="container">
+      <div class="header-inner">
+        <a href="#" class="brand-name">ECM Systems</a>
+        <nav class="header-nav" aria-label="Навигация по странице">
+          <a href="#cases" class="nav-link">Кейсы</a>
+          <a href="#info" class="nav-link">Стек и условия</a>
+          <a href="https://t.me/godblessed77" target="_blank" rel="noopener noreferrer" class="nav-link nav-tg">Telegram ↗</a>
+        </nav>
+      </div>
     </div>
   </header>
 
@@ -1132,7 +1288,7 @@
          ========================================================================== -->
     <div class="container">
       <section class="hero">
-        <h1 class="hero-title">ИИ-виджеты, Telegram-боты и кастомный фронтенд для агентств</h1>
+        <h1 class="hero-title">ИИ-виджеты, <span style="white-space: nowrap;">Telegram&#8209;боты</span> и кастомный фронтенд для агентств</h1>
         <p class="hero-lead">
           Технический субподряд на коде для веб-студий и CRM-интеграторов. Решения под брендом вашей команды там, где конструкторы упираются в потолок.
         </p>
@@ -1156,7 +1312,7 @@
           <article class="case-card">
             <!-- Превью видео и интерактивный Telegram-мокап -->
             <div class="case-media-side">
-              <!-- Сегментированный переключатель каналов -->
+              <!-- Сегментированный переключатель каналов (Liquid Glass) -->
               <div class="channel-switch-wrap" role="tablist" aria-label="Каналы демонстрации">
                 <button type="button" role="tab" class="channel-tab-btn is-active" data-channel="web" aria-selected="true" aria-controls="view-channel-web">
                   Веб-виджет
@@ -1245,7 +1401,7 @@
                   <li>Динамический расчет заказ-наряда, мягкие допродажи прямо в диалоге, запись в SQLite и Google Sheets, стабильная работа в РФ без VPN.</li>
                 </ul>
 
-                <!-- Двухуровневый инженерный блок интеграции «Сайт + Telegram» -->
+                <!-- Двухуровневый инженерный блок интеграции «Сайт + Telegram» (Liquid Glass) -->
                 <div class="integration-embed-box">
                   <!-- Строка 1: WEB -->
                   <div class="integration-row">
@@ -1311,7 +1467,7 @@
                   <li>Автоматическая передача заявок и параметров клиентов в Google Sheets или CRM.</li>
                 </ul>
 
-                <!-- Одиночная строка кода -->
+                <!-- Одиночная строка кода (Liquid Glass) -->
                 <div class="code-embed-row">
                   <span class="code-snippet">&lt;script src="sizing-concierge.js" data-brand="nordic"&gt;&lt;/script&gt;</span>
                   <button type="button" class="btn-copy-code" data-copy='<script src="sizing-concierge.js" data-brand="nordic"></script>'>Копировать</button>
@@ -1458,7 +1614,7 @@
         });
       });
 
-      // 4. ТАКТИЛЬНЫЙ СВЕТ ЗА КУРСОРОМ, СКРЫТАЯ СЕТКА И БЛИК НА КАРТОЧКАХ
+      // 4. ТАКТИЛЬНЫЙ СВЕТ ЗА КУРСОРОМ, УЗОР АСАНОХА И БЛИК НА КАРТОЧКАХ
       const hasFinePointer = window.matchMedia('(pointer: fine)').matches;
       const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
